@@ -24,7 +24,7 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 	fmt.Printf("Create jobs with params: %s\n", j)
 
 	// create cronjob
-	jobResult, err := ClientSet.BatchV1().Jobs("namespace").Create(context.TODO(), job, metav1.CreateOptions{})
+	jobResult, err := ClientSet.BatchV1().Jobs("default").Create(context.TODO(), job, metav1.CreateOptions{})
 	fmt.Printf("Create job complete, job result: %v\n", jobResult)
 	return err
 }
@@ -40,9 +40,6 @@ func jobSpec(task *inspectv1alpha1.Task, image string) *batchv1.Job {
 			Name:   taskName,
 			Labels: labels,
 		}, Spec: batchv1.JobSpec{
-			ActiveDeadlineSeconds:   &common.K8SJobTimeoutSeconds,
-			BackoffLimit:            &common.K8SJobBackoffLimit,
-			TTLSecondsAfterFinished: &common.K8SJobTTLSeconds,
 			Template: v1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,
@@ -77,5 +74,5 @@ func DeleteJob(tasks []*inspectv1alpha1.Task) error {
 	}
 	foreground := metav1.DeletePropagationForeground
 	deleteOptions := metav1.DeleteOptions{PropagationPolicy: &foreground}
-	return ClientSet.BatchV1().Jobs("namespace").DeleteCollection(context.TODO(), deleteOptions, listOptions)
+	return ClientSet.BatchV1().Jobs("default").DeleteCollection(context.TODO(), deleteOptions, listOptions)
 }

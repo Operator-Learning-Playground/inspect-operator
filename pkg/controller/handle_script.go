@@ -11,7 +11,7 @@ func handleScript(spec *inspectv1alpha1.InspectSpec) error {
 		if task.Task.Type == "script" {
 			err := script.RunLocalNode(task.Task.Source)
 			if err != nil {
-				klog.Error("create job err: ", err)
+				klog.Error("create script err: ", err)
 				return err
 			}
 		}
