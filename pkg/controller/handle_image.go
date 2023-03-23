@@ -15,6 +15,9 @@ func handleImage(spec *inspectv1alpha1.InspectSpec) error {
 				klog.Error("create job err: ", err)
 				return err
 			}
+			ticker := job.NewTickerTask(30, job.GetJobStatus, task.Task.TaskName)
+			klog.Info("启动定时任务")
+			go ticker.Start()
 		}
 	}
 

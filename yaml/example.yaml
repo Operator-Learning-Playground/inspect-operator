@@ -11,7 +11,6 @@ spec:
         script_location: local # 可选填 local remote all 三种，分别对应 本地节点 远端节点 全部节点
         # 选取local本地节点 就不需要再填写远端ip地址
         # 远端要执行的目标node
-
     - task:
         task_name: task2
         type: image

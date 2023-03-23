@@ -2,14 +2,7 @@ Tasks:
 - Task:
     RemoteIps: null
     Restart: false
-    ScriptLocation: local
-    Source: test.sh
-    TaskName: task1
-    Type: script
-- Task:
-    RemoteIps: null
-    Restart: false
     ScriptLocation: ""
     Source: try:latest
-    TaskName: task2
+    TaskName: task21
     Type: image

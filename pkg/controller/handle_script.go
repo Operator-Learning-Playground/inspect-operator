@@ -9,11 +9,15 @@ import (
 func handleScript(spec *inspectv1alpha1.InspectSpec) error {
 	for _, task := range spec.Tasks {
 		if task.Task.Type == "script" {
-			err := script.RunLocalNode(task.Task.Source)
-			if err != nil {
-				klog.Error("create script err: ", err)
-				return err
-			}
+			go func() {
+				err := script.RunLocalNode(task.Task.Source)
+				if err != nil {
+					klog.Error("create script err: ", err)
+					return
+				}
+
+			}()
+
 		}
 	}
 

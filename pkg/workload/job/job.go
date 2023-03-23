@@ -11,7 +11,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
-	"time"
 )
 
 // CreateJob
@@ -25,14 +24,22 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 
 	// create cronjob
 	jobResult, err := ClientSet.BatchV1().Jobs("default").Create(context.TODO(), job, metav1.CreateOptions{})
+	// TODO
 	fmt.Printf("Create job complete, job result: %v\n", jobResult)
 	return err
+}
+
+func getJobTaskName(taskName string) string {
+	res := fmt.Sprintf("inspect-manual-task-%v", taskName)
+	return res
 }
 
 func jobSpec(task *inspectv1alpha1.Task, image string) *batchv1.Job {
 	fmt.Printf("Create k8s job params: taskName=%v\n", task.TaskName)
 	// init
-	taskName := fmt.Sprintf("inspect-manual-task-%v-%d", task.TaskName, time.Now().Unix())
+	taskName := fmt.Sprintf("inspect-manual-task-%v", task.TaskName)
+	// FIXME: 使用时间戳会有定时任务查不到的问题
+	//taskName := fmt.Sprintf("inspect-manual-task-%v-%d", task.TaskName, time.Now().Unix())
 	labels := map[string]string{"taskType": "inspect", "app": taskName}
 	return &batchv1.Job{
 		// metadata
