@@ -9,7 +9,7 @@ import (
 
 func main() {
 	//path := common.GetWd()
-	cmd := exec.Command("bash", "./script/test.sh")
+	cmd := exec.Command("sh", "./script/test.sh")
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout // 标准输出

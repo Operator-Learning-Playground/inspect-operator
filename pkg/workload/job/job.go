@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 	"strings"
+	"time"
 )
 
 // CreateJob
@@ -37,6 +38,7 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 			klog.Error("Delete job error: ", err)
 			return err
 		}
+		time.Sleep(time.Second * 60) // 需要等待删除才执行create
 		jobResult, err = ClientSet.BatchV1().Jobs("default").Create(context.TODO(), job, metav1.CreateOptions{})
 		if err != nil {
 			klog.Error("Create job error: ", err)
