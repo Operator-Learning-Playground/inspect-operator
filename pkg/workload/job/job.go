@@ -9,7 +9,9 @@ import (
 	. "github.com/myoperator/inspectoperator/pkg/workload"
 	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog/v2"
 	"strings"
 )
 
@@ -24,9 +26,32 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 
 	// create cronjob
 	jobResult, err := ClientSet.BatchV1().Jobs("default").Create(context.TODO(), job, metav1.CreateOptions{})
-	// TODO
+	// FIXME: 处理已经存在job的错误 errors包
+	// 方案：捞出exists错误，先删除原job，再创建。
+	if err != nil && errors.IsAlreadyExists(err) {
+		// 先删除原本的job
+		klog.Error("Error maybe is AlreadyExists error: ", err)
+		foreground := metav1.DeletePropagationForeground
+		deleteOptions := metav1.DeleteOptions{PropagationPolicy: &foreground}
+		if err = ClientSet.BatchV1().Jobs("default").Delete(context.Background(), getJobTaskName(task.TaskName), deleteOptions); err != nil {
+			klog.Error("Delete job error: ", err)
+			return err
+		}
+		jobResult, err = ClientSet.BatchV1().Jobs("default").Create(context.TODO(), job, metav1.CreateOptions{})
+		if err != nil {
+			klog.Error("Create job error: ", err)
+			return err
+		}
+		fmt.Printf("First delete job and create job complete, job result: %v\n", jobResult)
+
+		return nil
+	}
+	if err != nil {
+		klog.Error("Create job error: ", err)
+		return err
+	}
 	fmt.Printf("Create job complete, job result: %v\n", jobResult)
-	return err
+	return nil
 }
 
 func getJobTaskName(taskName string) string {

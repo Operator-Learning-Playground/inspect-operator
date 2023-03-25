@@ -22,6 +22,7 @@ type InspectSpec struct {
 	Tasks []Tasks `json:"tasks"`
 }
 
+// InspectStatus 任务完成状态：TODO 目前还没用到
 type InspectStatus struct {
 	Results []TaskRes  `json:"results"`
 }

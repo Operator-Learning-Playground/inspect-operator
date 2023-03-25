@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	// 测试取到job
 	r, err := ClientSet.BatchV1().Jobs("default").Get(context.Background(), "res", v1.GetOptions{})
 
 	if err != nil && errors.IsNotFound(err) {
@@ -20,4 +21,11 @@ func main() {
 		return
 	}
 	fmt.Println(r)
+
+	// 取到message-operator的svc
+	svc, err := ClientSet.CoreV1().Services("default").Get(context.Background(), "mymessage-svc", v1.GetOptions{})
+	if err != nil {
+		klog.Error(err)
+	}
+	fmt.Println(svc.Status)
 }

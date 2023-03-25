@@ -47,7 +47,6 @@ func (t *MyTickerTask) Start() {
 				request.Post("http://42.193.17.123:31130/v1/send", t.TaskName, fmt.Sprintf("you job res: %v", res))
 				t.stopC <- struct{}{}
 			}
-
 		case <-t.stopC:
 			klog.Info("定时任务退出！")
 			time.Sleep(time.Second * 3)
@@ -85,8 +84,3 @@ func checkStatus(status *batchv1.JobStatus) (string, bool) {
 	return "", true
 
 }
-
-//func main() {
-//	t := NewMyTick( 1 ,testPrint)
-//	t.Start()
-//}

@@ -32,7 +32,7 @@ spec:
       volumes:
         - name: app
           hostPath:
-            path: /root/k8s-operator-inspect
+            path: /root/inspectoperator
 ---
 apiVersion: v1
 kind: Service
