@@ -17,16 +17,16 @@ type Fn func(taskName string) (bool, error, string)
 
 // MyTickerTask 定时器中的成员
 type MyTickerTask struct {
-	MyTick *time.Ticker
-	Runner Fn
+	MyTick   *time.Ticker
+	Runner   Fn
 	TaskName string
 	stopC    chan struct{}
 }
 
 func NewTickerTask(interval int, f Fn, taskName string) *MyTickerTask {
 	return &MyTickerTask{
-		MyTick: time.NewTicker(time.Duration(interval) * time.Second),
-		Runner: f,
+		MyTick:   time.NewTicker(time.Duration(interval) * time.Second),
+		Runner:   f,
 		TaskName: taskName,
 	}
 }
@@ -58,7 +58,7 @@ func (t *MyTickerTask) Start() {
 
 // GetJobStatus 获取job状态
 // 返回值：bool:代表是否还要继续执行，error:是否有错误，string:代表结果
-func GetJobStatus(taskName string) (bool, error, string){
+func GetJobStatus(taskName string) (bool, error, string) {
 	res := getJobTaskName(taskName)
 
 	getJob, err := ClientSet.BatchV1().Jobs("default").Get(context.Background(), res, v1.GetOptions{})

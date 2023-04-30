@@ -6,10 +6,14 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	imageType = "image"
+)
+
 func handleImage(spec *inspectv1alpha1.InspectSpec) error {
 
 	for _, task := range spec.Tasks {
-		if task.Task.Type == "image" {
+		if task.Task.Type == imageType {
 			err := job.CreateJob(&task.Task, task.Task.Source)
 			if err != nil {
 				klog.Error("create job err: ", err)

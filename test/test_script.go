@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"k8s.io/klog/v2"
 
 	"log"
 	"os/exec"
@@ -16,14 +17,12 @@ func main() {
 	cmd.Stderr = &stderr // 标准错误
 	err := cmd.Run()
 	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
-	log.Printf("out:\n%s\nerr:\n%s\n", outStr, errStr)
+	klog.Info("out:\n%s\nerr:\n%s\n", outStr, errStr)
 	if err != nil {
-		log.Printf("cmd.Run() failed with %s\n", err)
+		klog.Info("cmd.Run() failed with %s\n", err)
 		return
 	}
 
 	return
 
 }
-
-

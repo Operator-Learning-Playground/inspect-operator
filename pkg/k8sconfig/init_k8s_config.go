@@ -18,18 +18,17 @@ func K8sRestConfig() *rest.Config {
 	}
 
 	path := common.GetWd()
-	config, err := clientcmd.BuildConfigFromFlags("", path + "/resources/config")
+	config, err := clientcmd.BuildConfigFromFlags("", path+"/resources/config")
 	if err != nil {
 		log.Fatal(err)
 	}
 	config.Insecure = true
 	klog.Info("run outside the cluster")
 	return config
-
 }
 
 // k8sRestConfigInPod 集群内部POD里使用
-func k8sRestConfigInPod() *rest.Config{
+func k8sRestConfigInPod() *rest.Config {
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -37,4 +36,3 @@ func k8sRestConfigInPod() *rest.Config{
 	}
 	return config
 }
-

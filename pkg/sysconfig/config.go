@@ -8,7 +8,6 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-
 var SysConfig1 = new(SysConfig)
 
 func InitConfig() error {
@@ -56,13 +55,12 @@ type SysConfig struct {
 	Tasks []Tasks `yaml:"tasks"`
 }
 
-
 func AppConfig(inspect *inspectv1alpha1.Inspect) error {
 
 	// 1. 需要先把SysConfig1中的都删除
-    if len(SysConfig1.Tasks) != len(inspect.Spec.Tasks) {
-    	// 清零后需要先更新app.yaml文件
-    	SysConfig1.Tasks = make([]Tasks, len(inspect.Spec.Tasks))
+	if len(SysConfig1.Tasks) != len(inspect.Spec.Tasks) {
+		// 清零后需要先更新app.yaml文件
+		SysConfig1.Tasks = make([]Tasks, len(inspect.Spec.Tasks))
 		if err := saveConfigToFile(); err != nil {
 			return err
 		}
@@ -80,7 +78,6 @@ func AppConfig(inspect *inspectv1alpha1.Inspect) error {
 			SysConfig1.Tasks[i].Task.RemoteIps[k].RemoteIp.Password = remoteIp.RemoteIp.Password
 			SysConfig1.Tasks[i].Task.RemoteIps[k].RemoteIp.Ip = remoteIp.RemoteIp.Ip
 		}
-
 
 	}
 	// 保存配置文件

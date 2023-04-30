@@ -75,5 +75,3 @@ func Post(url, title, content string) {
 	}
 
 }
-
-

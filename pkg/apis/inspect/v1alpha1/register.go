@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	InspectGroup = "api.practice.com"
+	InspectGroup   = "api.practice.com"
 	InspectVersion = "v1alpha1"
 )
+
 // SchemeGroupVersion is group version used to register these objects
 var SchemeGroupVersion = schema.GroupVersion{Group: InspectGroup, Version: InspectVersion}
 

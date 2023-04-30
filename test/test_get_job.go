@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	. "github.com/myoperator/inspectoperator/pkg/workload"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,12 +19,12 @@ func main() {
 		klog.Error("get job error ", err)
 		return
 	}
-	fmt.Println(r)
+	klog.Info(r)
 
 	// 取到message-operator的svc
 	svc, err := ClientSet.CoreV1().Services("default").Get(context.Background(), "mymessage-svc", v1.GetOptions{})
 	if err != nil {
 		klog.Error(err)
 	}
-	fmt.Println(svc.Status)
+	klog.Info(svc.Status)
 }

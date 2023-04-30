@@ -24,12 +24,12 @@ type InspectSpec struct {
 
 // InspectStatus 任务完成状态：TODO 目前还没用到
 type InspectStatus struct {
-	Results []TaskRes  `json:"results"`
+	Results []TaskRes `json:"results"`
 }
 
 type TaskRes struct {
-	TaskName string  `json:"task_name"`
-	Res      string  `json:"res"`
+	TaskName string `json:"task_name"`
+	Res      string `json:"res"`
 }
 
 type Tasks struct {
@@ -65,5 +65,3 @@ type InspectList struct {
 
 	Items []Inspect `json:"items"`
 }
-
-

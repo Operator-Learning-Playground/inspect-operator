@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 // IsCronExpressionValid
 // Same as org.quartz.CronExpression.IsExpressValid(string) boolean
 func IsCronExpressionValid(spec string) bool {

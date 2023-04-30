@@ -13,7 +13,7 @@ import (
 func RunLocalNode(script string) error {
 	path := common.GetWd()
 	// 修正镜像没有bash
-	cmd := exec.Command("sh", path + "/script/" + script)
+	cmd := exec.Command("sh", path+"/script/"+script)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout // 标准输出

@@ -6,9 +6,13 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	scriptType = "script"
+)
+
 func handleScript(spec *inspectv1alpha1.InspectSpec) error {
 	for _, task := range spec.Tasks {
-		if task.Task.Type == "script" {
+		if task.Task.Type == scriptType {
 			// FIXME: 目前就是异步执行，后面controller就不管。
 			go func() {
 				err := script.RunLocalNode(task.Task.Source)
@@ -18,7 +22,6 @@ func handleScript(spec *inspectv1alpha1.InspectSpec) error {
 				}
 
 			}()
-
 		}
 	}
 
