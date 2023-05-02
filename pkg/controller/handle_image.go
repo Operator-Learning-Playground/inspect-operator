@@ -21,7 +21,7 @@ func handleImage(spec *inspectv1alpha1.InspectSpec) error {
 			}
 			// 启动定时任务
 			ticker := job.NewTickerTask(30, job.GetJobStatus, task.Task.TaskName)
-			klog.Info("启动定时任务")
+			klog.Info("start cron task...")
 			go ticker.Start()
 		}
 	}

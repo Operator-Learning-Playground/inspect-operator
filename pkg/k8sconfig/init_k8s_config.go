@@ -27,7 +27,7 @@ func K8sRestConfig() *rest.Config {
 	return config
 }
 
-// k8sRestConfigInPod 集群内部POD里使用
+// k8sRestConfigInPod 集群内pod使用
 func k8sRestConfigInPod() *rest.Config {
 
 	config, err := rest.InClusterConfig()

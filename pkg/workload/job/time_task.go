@@ -48,7 +48,7 @@ func (t *MyTickerTask) Start() {
 				t.stopC <- struct{}{}
 			}
 		case <-t.stopC:
-			klog.Info("定时任务退出！")
+			klog.Info("stop the cron task...")
 			time.Sleep(time.Second * 3)
 			return
 		}

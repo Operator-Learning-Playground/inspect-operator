@@ -6,6 +6,7 @@ import (
 	"github.com/myoperator/inspectoperator/pkg/sysconfig"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -31,21 +32,35 @@ func (r *InspectController) Reconcile(ctx context.Context, req reconcile.Request
 		return reconcile.Result{}, nil
 	}
 	klog.Info(inspect)
+
+	// update config
 	err = sysconfig.AppConfig(inspect)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// FIXME: 如何解决重复进入的问题
-	// 业务逻辑
-	err = handleImage(&inspect.Spec)
+	// 使用CreateOrUpdate处理业务逻辑
+	mutateInspectRes, err := controllerutil.CreateOrUpdate(ctx, r.Client, inspect, func() error {
+		// FIXME: 如何解决重复进入的问题
+		klog.Info("is in...?")
+		// 业务逻辑
+		err = handleImage(&inspect.Spec)
+		if err != nil {
+			klog.Error("handle image error: ", err)
+			return err
+		}
+		err = handleScript(&inspect.Spec)
+		if err != nil {
+			klog.Error("handle script error: ", err)
+			return err
+		}
+		return nil
+	})
 	if err != nil {
+		klog.Error("CreateOrUpdate error ", " Inspect ", err)
 		return reconcile.Result{}, err
 	}
-	err = handleScript(&inspect.Spec)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
+	klog.Info("CreateOrUpdate ", "Inspect ", mutateInspectRes)
 
 	return reconcile.Result{}, nil
 }
