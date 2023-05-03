@@ -10,21 +10,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/recorder"
 )
 
-var (
-	recorderProvider recorder.Provider
-)
 
 type InspectController struct {
 	client.Client
-	EventRecord record.EventRecorder
+	EventRecorder record.EventRecorder // 事件管理器
 }
 
-func NewInspectController() *InspectController {
-	r := recorderProvider.GetEventRecorderFor("message-operator")
-	return &InspectController{EventRecord: r}
+func NewInspectController(eventRecorder record.EventRecorder) *InspectController {
+	return &InspectController{EventRecorder: eventRecorder}
 }
 
 // Reconcile 调协loop
@@ -42,38 +37,44 @@ func (r *InspectController) Reconcile(ctx context.Context, req reconcile.Request
 	}
 	klog.Info(inspect)
 
+	// 当前正在删
+	if !inspect.DeletionTimestamp.IsZero() {
+		klog.Info("delete the message....")
+		return reconcile.Result{}, nil
+	}
 
 	// 使用CreateOrUpdate处理业务逻辑
 	mutateInspectRes, err := controllerutil.CreateOrUpdate(ctx, r.Client, inspect, func() error {
 		// update config
 		err = sysconfig.AppConfig(inspect)
 		if err != nil {
-			r.EventRecord.Event(inspect, corev1.EventTypeWarning, "UpdateFail", "appconfig update fail...")
+			r.EventRecorder.Event(inspect, corev1.EventTypeWarning, "UpdateFailed", "update app config fail...")
 			return err
 		}
-		r.EventRecord.Event(inspect, corev1.EventTypeNormal, "Update", "appconfig update...")
 		// FIXME: 如何解决重复进入的问题
 		klog.Info("is in...?")
 		// 业务逻辑
 		err = handleImage(&inspect.Spec)
 		if err != nil {
 			klog.Error("handle image error: ", err)
-			r.EventRecord.Event(inspect, corev1.EventTypeWarning, "RunImageTask", "running image inspect task error...")
+			r.EventRecorder.Event(inspect, corev1.EventTypeWarning, "RunningFail", "running image task fail...")
 			return err
 		}
+		r.EventRecorder.Event(inspect, corev1.EventTypeNormal, "Running", "running image task...")
 		err = handleScript(&inspect.Spec)
 		if err != nil {
 			klog.Error("handle script error: ", err)
-			r.EventRecord.Event(inspect, corev1.EventTypeWarning, "RunScriptTask", "running script inspect task error...")
+			r.EventRecorder.Event(inspect, corev1.EventTypeWarning, "RunningFail", "running script task...")
 			return err
 		}
-		r.EventRecord.Event(inspect, corev1.EventTypeNormal, "InspectTaskRunning", "running inspect task...")
+		r.EventRecorder.Event(inspect, corev1.EventTypeNormal, "Running", "running script task...")
 		return nil
 	})
 	if err != nil {
 		klog.Error("CreateOrUpdate error: ", err)
 		return reconcile.Result{}, err
 	}
+
 	klog.Info("CreateOrUpdate ", "Inspect ", mutateInspectRes)
 
 	return reconcile.Result{}, nil
