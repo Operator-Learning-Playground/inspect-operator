@@ -23,7 +23,7 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 	job := jobSpec(task, image)
 
 	j, _ := json.Marshal(job)
-	fmt.Printf("Create jobs with params: %s\n", j)
+	klog.Info("Create jobs with params: ", string(j))
 
 	// create cronjob
 	jobResult, err := ClientSet.BatchV1().Jobs("default").Create(context.TODO(), job, metav1.CreateOptions{})
@@ -34,7 +34,7 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 		klog.Error("Error maybe is AlreadyExists error: ", err)
 		foreground := metav1.DeletePropagationForeground
 		deleteOptions := metav1.DeleteOptions{PropagationPolicy: &foreground}
-		if err = ClientSet.BatchV1().Jobs("default").Delete(context.Background(), getJobTaskName(task.TaskName), deleteOptions); err != nil {
+		if err = ClientSet.BatchV1().Jobs("default").Delete(context.Background(), getJobTaskName(task.TaskName, task.Type), deleteOptions); err != nil {
 			klog.Error("Delete job error: ", err)
 			return err
 		}
@@ -44,7 +44,7 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 			klog.Error("Create job error: ", err)
 			return err
 		}
-		fmt.Printf("First delete job and create job complete, job result: %v\n", jobResult)
+		klog.Info("First delete job and create job complete, job result: ", jobResult)
 
 		return nil
 	}
@@ -52,19 +52,62 @@ func CreateJob(task *inspectv1alpha1.Task, image string) error {
 		klog.Error("Create job error: ", err)
 		return err
 	}
-	fmt.Printf("Create job complete, job result: %v\n", jobResult)
+	klog.Info("Create job complete, job result: ", jobResult)
 	return nil
 }
 
-func getJobTaskName(taskName string) string {
-	res := fmt.Sprintf("inspect-manual-task-%v", taskName)
+func getJobTaskName(taskName string, t string) string {
+	var res string
+	if t == common.ImageType {
+		res = fmt.Sprintf("inspect-image-task-%v", taskName)
+	} else if t == common.ScriptType {
+		res = fmt.Sprintf("inspect-script-task-%v", taskName)
+	}
+	return res
+}
+
+func getContainerEnv(task *inspectv1alpha1.Task) []v1.EnvVar {
+	eList := make([]v1.EnvVar, 0)
+	if task.Type == common.ScriptType {
+		e := v1.EnvVar{
+			Name:  "script",
+			Value: common.EncodeScript(task.Script),
+		}
+		eList = append(eList, e)
+	}
+
+	e1 := v1.EnvVar{
+		Name:  "taskName",
+		Value: task.TaskName,
+	}
+	e2 := v1.EnvVar{
+		Name:  "type",
+		Value: task.Type,
+	}
+	e3 := v1.EnvVar{
+		Name:  "message-operator-url",
+		Value: "http://42.193.17.123:31130/v1/send",
+	}
+	eList = append(eList, e1)
+	eList = append(eList, e2)
+	eList = append(eList, e3)
+	return eList
+}
+
+func setJobTaskName(taskName string, t string) string {
+	var res string
+	if t == common.ImageType {
+		res = fmt.Sprintf("inspect-image-task-%v", taskName)
+	} else if t == common.ScriptType {
+		res = fmt.Sprintf("inspect-script-task-%v", taskName)
+	}
 	return res
 }
 
 func jobSpec(task *inspectv1alpha1.Task, image string) *batchv1.Job {
-	fmt.Printf("Create k8s job params: taskName=%v\n", task.TaskName)
+	klog.Info("Create k8s job params: taskName= ", task.TaskName)
 	// init
-	taskName := fmt.Sprintf("inspect-manual-task-%v", task.TaskName)
+	taskName := setJobTaskName(task.TaskName, task.Type)
 	// FIXME: 使用时间戳会有定时任务查不到的问题
 	//taskName := fmt.Sprintf("inspect-manual-task-%v-%d", task.TaskName, time.Now().Unix())
 	labels := map[string]string{"taskType": "inspect", "app": taskName}
@@ -84,6 +127,7 @@ func jobSpec(task *inspectv1alpha1.Task, image string) *batchv1.Job {
 						Name:            "default",
 						Image:           image,
 						ImagePullPolicy: v1.PullIfNotPresent,
+						Env:             getContainerEnv(task),
 					}},
 					// restart policy
 					RestartPolicy:      v1.RestartPolicyNever,

@@ -13,17 +13,18 @@ import (
 )
 
 // Fn 定义函数类型
-type Fn func(taskName string) (bool, error, string)
+type Fn func(taskName string, t string) (bool, error, string)
 
 // MyTickerTask 定时器中的成员
 type MyTickerTask struct {
 	MyTick   *time.Ticker
 	Runner   Fn
 	TaskName string
+	TaskType string
 	stopC    chan struct{}
 }
 
-func NewTickerTask(interval int, f Fn, taskName string) *MyTickerTask {
+func NewTickerTask(interval int, f Fn, taskName string, taskType string) *MyTickerTask {
 	return &MyTickerTask{
 		MyTick:   time.NewTicker(time.Duration(interval) * time.Second),
 		Runner:   f,
@@ -36,7 +37,7 @@ func (t *MyTickerTask) Start() {
 	for {
 		select {
 		case <-t.MyTick.C:
-			isReStart, err, res := t.Runner(t.TaskName)
+			isReStart, err, res := t.Runner(t.TaskName, t.TaskType)
 			if isReStart {
 				continue
 			}
@@ -58,15 +59,15 @@ func (t *MyTickerTask) Start() {
 
 // GetJobStatus 获取job状态
 // 返回值：bool:代表是否还要继续执行，error:是否有错误，string:代表结果
-func GetJobStatus(taskName string) (bool, error, string) {
-	res := getJobTaskName(taskName)
+func GetJobStatus(taskName string, t string) (bool, error, string) {
+	res := getJobTaskName(taskName, t)
 
 	getJob, err := ClientSet.BatchV1().Jobs("default").Get(context.Background(), res, v1.GetOptions{})
 	if err != nil && errors.IsNotFound(err) {
 		klog.Error("not found error ", err)
 		return false, err, fmt.Sprintf("not found error")
 	} else if err != nil {
-		klog.Error("get job error ", err)
+		klog.Error("get job error: ", err)
 		return false, err, err.Error()
 	}
 	klog.Info("get job: ", getJob.Name)

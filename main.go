@@ -30,8 +30,8 @@ func main() {
 	var d time.Duration = 0
 	// 1. 管理器初始化
 	mgr, err := manager.New(k8sconfig.K8sRestConfig(), manager.Options{
-		Logger: logf.Log.WithName("inspect-operator"),
-		SyncPeriod: &d,		// resync不设置触发
+		Logger:     logf.Log.WithName("inspect-operator"),
+		SyncPeriod: &d, // resync不设置触发
 	})
 	if err != nil {
 		mgr.GetLogger().Error(err, "unable to set up manager")

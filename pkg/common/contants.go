@@ -27,4 +27,9 @@ var K8SJobTimeoutSeconds int64 = 60 * 60
 
 var K8SStartingDeadlineSeconds int64 = 60 * 5
 
-const DefaultServiceAccount = "myinspect-sa"
+const (
+	DefaultServiceAccount = "myinspect-sa"
+	ScriptType            = "script"
+	ImageType             = "image"
+	ScriptExecuteImage    = "inspect-operator/script-engine:v1"
+)

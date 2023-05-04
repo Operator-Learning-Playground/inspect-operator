@@ -3,6 +3,7 @@ package request
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"k8s.io/klog/v2"
 	"net/http"
@@ -50,6 +51,7 @@ func Post(url, title, content string) {
 	}
 
 	body, _ := json.Marshal(send)
+
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body)) // ignore_security_alert
 
 	if err != nil {
@@ -66,7 +68,7 @@ func Post(url, title, content string) {
 			return
 		}
 		jsonStr := string(body)
-		klog.Info("Response: ", jsonStr)
+		fmt.Println("Response: ", jsonStr)
 
 	} else {
 		klog.Error("Get failed with error: ", resp.Status)

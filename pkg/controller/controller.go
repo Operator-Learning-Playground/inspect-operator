@@ -12,7 +12,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-
 type InspectController struct {
 	client.Client
 	EventRecorder record.EventRecorder // 事件管理器

@@ -50,6 +50,7 @@ type Task struct {
 	TaskName       string      `json:"task_name"`
 	Type           string      `json:"type"`
 	Source         string      `json:"source"`
+	Script         string      `json:"script"`
 	ScriptLocation string      `json:"script_location"`
 	RemoteIps      []RemoteIps `json:"remote_ips"`
 	Restart        bool        `json:"restart"`
