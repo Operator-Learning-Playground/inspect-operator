@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	inspectv1alpha1 "github.com/myoperator/inspectoperator/pkg/apis/inspect/v1alpha1"
 	"github.com/myoperator/inspectoperator/pkg/sysconfig"
 	corev1 "k8s.io/api/core/v1"
@@ -35,7 +36,9 @@ func (r *InspectController) Reconcile(ctx context.Context, req reconcile.Request
 		return reconcile.Result{}, nil
 	}
 	klog.Info(inspect)
-
+	for _, v := range inspect.Spec.Tasks {
+		fmt.Println(v.Task.RemoteIps)
+	}
 	// 当前正在删
 	if !inspect.DeletionTimestamp.IsZero() {
 		klog.Info("delete the message....")

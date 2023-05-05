@@ -1,8 +1,12 @@
-# 检查cpu的空闲率是否小于20%
-cpuCount=$[$(vmstat -SM | awk '{if ($15 < 20) print $0}' | wc -l)-1]
-if [ $cpuCount -gt 0 ]
+# 检查内存的空闲率是否大于20%
+a=`cat /proc/meminfo | sed -n '/MemAvailable/p'| awk '{print $2}'`;
+t=`cat /proc/meminfo | sed -n '/MemTotal/p'| awk '{print $2}'`;
+r=`echo "scale=4; ( $a / $t) * 100" | bc`;
+echo -e "FreeMem Ratio (%): $r"
+
+if [ `echo ${r} | awk -v tem=20 '{print($1>tem)? "1":"0"}'` -eq "0" ]
 then
-    echo caseName:cpu的使用率小于80%, caseDesc:, result:fail, resultDesc:有${cpuCount}个cpu的使用率大于80%
+    echo caseName:内存的使用率小于80%, caseDesc:, result:fail, resultDesc:内存的使用率大于80%
 else
-    echo caseName:cpu的使用率小于80%, caseDesc:, result:success, resultDesc:cpu的使用率都小于80%
+    echo caseName:内存的使用率小于80%, caseDesc:, result:success, resultDesc:内存的使用率小于80%
 fi

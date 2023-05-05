@@ -36,14 +36,10 @@ type Tasks struct {
 	Task Task `json:"task"`
 }
 
-type RemoteIp struct {
+type RemoteIps struct {
 	Ip       string `json:"ip"`
 	User     string `json:"user"`
 	Password string `json:"password"`
-}
-
-type RemoteIps struct {
-	RemoteIp RemoteIp `json:"remote_ip"`
 }
 
 type Task struct {

@@ -38,17 +38,13 @@ type RemoteIp struct {
 	Password string `yaml:"password"`
 }
 
-type RemoteIps struct {
-	RemoteIp RemoteIp `yaml:"remote_ip"`
-}
-
 type Task struct {
-	TaskName       string      `yaml:"task_name"`
-	Type           string      `yaml:"type"`
-	Source         string      `yaml:"source"`
-	ScriptLocation string      `yaml:"script_location"`
-	RemoteIps      []RemoteIps `yaml:"remote_ips"`
-	Restart        bool        `yaml:"restart"`
+	TaskName       string     `yaml:"task_name"`
+	Type           string     `yaml:"type"`
+	Source         string     `yaml:"source"`
+	ScriptLocation string     `yaml:"script_location"`
+	RemoteIps      []RemoteIp `yaml:"remote_ips"`
+	Restart        bool       `yaml:"restart"`
 }
 
 type SysConfig struct {
@@ -73,12 +69,18 @@ func AppConfig(inspect *inspectv1alpha1.Inspect) error {
 		SysConfig1.Tasks[i].Task.Source = task.Task.Source
 		SysConfig1.Tasks[i].Task.ScriptLocation = task.Task.ScriptLocation
 		SysConfig1.Tasks[i].Task.Restart = task.Task.Restart
-		for k, remoteIp := range task.Task.RemoteIps {
-			SysConfig1.Tasks[i].Task.RemoteIps[k].RemoteIp.User = remoteIp.RemoteIp.User
-			SysConfig1.Tasks[i].Task.RemoteIps[k].RemoteIp.Password = remoteIp.RemoteIp.Password
-			SysConfig1.Tasks[i].Task.RemoteIps[k].RemoteIp.Ip = remoteIp.RemoteIp.Ip
-		}
+		// 更新远端局点信息
+		v := make([]RemoteIp, 0)
+		for _, remoteIp := range task.Task.RemoteIps {
+			ii := RemoteIp{
+				User:     remoteIp.User,
+				Password: remoteIp.Password,
+				Ip:       remoteIp.Ip,
+			}
+			v = append(v, ii)
 
+		}
+		SysConfig1.Tasks[i].Task.RemoteIps = v
 	}
 	// 保存配置文件
 	if err := saveConfigToFile(); err != nil {

@@ -14,7 +14,6 @@ func RunLocalNode() error {
 	path := common.GetWd()
 	// 修正镜像没有bash
 	cmd := exec.Command("sh", path + common.ScriptFile)
-	//cmd := exec.Command("echo", "caseName:CPU是否降频, caseDesc:, result:fail, resultDesc:有CPU降频")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout // 标准输出
 	cmd.Stderr = &stderr // 标准错误

@@ -88,9 +88,36 @@ func getContainerEnv(task *inspectv1alpha1.Task) []v1.EnvVar {
 		Name:  "message-operator-url",
 		Value: "http://42.193.17.123:31130/v1/send",
 	}
+	e4 := v1.EnvVar{
+		Name:  "script_location",
+		Value: task.ScriptLocation,
+	}
+
+	// 如果是远端节点，把user password ip 注入环境变量
+	if task.ScriptLocation == "remote" {
+		for _, v := range task.RemoteIps {
+			eUser := v1.EnvVar{
+				Name:  "user",
+				Value: v.User,
+			}
+			ePassword := v1.EnvVar{
+				Name:  "password",
+				Value: v.Password,
+			}
+			eIp := v1.EnvVar{
+				Name:  "ip",
+				Value: v.Ip,
+			}
+			eList = append(eList, eUser)
+			eList = append(eList, ePassword)
+			eList = append(eList, eIp)
+		}
+
+	}
 	eList = append(eList, e1)
 	eList = append(eList, e2)
 	eList = append(eList, e3)
+	eList = append(eList, e4)
 	return eList
 }
 
@@ -146,7 +173,7 @@ func DeleteJob(tasks []*inspectv1alpha1.Task) error {
 	for i, task := range tasks {
 		ids[i] = task.TaskName
 	}
-	fmt.Printf("Delete k8s job, task ids: %#v\n", ids)
+	klog.Info("Delete k8s job, task ids: ", ids)
 	listOptions := metav1.ListOptions{
 		LabelSelector: fmt.Sprintf("taskId in (%s)", strings.Join(ids, ",")),
 	}

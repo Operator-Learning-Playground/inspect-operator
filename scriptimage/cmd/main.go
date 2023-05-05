@@ -22,11 +22,21 @@ func main() {
 		klog.Error("decode err:", err)
 		return
 	}
-	err = execute.RunLocalNode()
-	if err != nil {
-		klog.Error("execute err:", err)
-		return
+	if os.Getenv("script_location") == "remote" {
+		err = execute.RunRemoteNode(os.Getenv("user"), os.Getenv("password"), os.Getenv("ip"))
+		if err != nil {
+			klog.Error("execute err:", err)
+			return
+		}
+	} else {
+		klog.Info("run inspect task in local...")
+		err = execute.RunLocalNode()
+		if err != nil {
+			klog.Error("execute err:", err)
+			return
+		}
 	}
+
 
 	klog.Info("finished script inspect task...")
 }
