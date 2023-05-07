@@ -53,8 +53,8 @@ spec:
         # 远端要执行的目标node的信息：user password ip等
         remote_ips:
           - user: "root"
-            password: "googs1025Aa1234567"
-            ip: "1.14.120.233"
+            password: "xxxxxx"
+            ip: "xxxxxx"
         script: |
           # 检查是否有CPU降频
           count=0
