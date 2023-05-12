@@ -15,9 +15,9 @@ Tasks:
     Type: image
 - Task:
     RemoteIps:
-    - Ip: xxxx
-      Password: xxxxxx
-      User: xxxxx
+    - Ip: 1.14.120.233
+      Password: googs1025Aa1234567
+      User: root
     Restart: false
     ScriptLocation: remote
     Source: ""
